@@ -1,1 +1,2400 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="LessonVault - Learning Repository of City College of Cagayan de Oro">
+<title>LessonVault | City College of Cagayan de Oro</title>
+
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+        --green: #006b35;
+        --green-dark: #005529;
+        --green-deep: #004d27;
+        --green-soft: #eaffea;
+        --mint: #effff0;
+        --gold: #ffd21a;
+        --gold-dark: #e5b800;
+        --white: #fff;
+        --text: #164c31;
+        --muted: #65746c;
+        --border: #cfe5d5;
+        --danger: #dc3545;
+        --shadow: 0 10px 28px rgba(0, 82, 42, .12);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+        font-family: Georgia, "Times New Roman", serif;
+        background: var(--mint);
+        color: var(--text);
+        line-height: 1.5;
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    .hidden { display: none !important; }
+
+    /* ================= LOGIN ================= */
+    .login-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: grid;
+        place-items: center;
+        padding: 22px;
+        overflow: auto;
+       background-image: url('cccdo-bg.png');
+       background-size: cover;
+       background-position: center;
+       background-repeat: no-repeat;
+       min-height: calc(100vh - 70px);
+       
+    }
+
+    .login-card {
+        width: min(900px, 100%);
+        min-height: 430px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: rgba(255,255,255,.96);
+        border-radius: 28px;
+        overflow: hidden;
+        border: 2px solid rgba(0,107,53,.15);
+        box-shadow: 0 25px 70px rgba(0,60,30,.22);
+        animation: rise .55s ease;
+    }
+
+    .login-brand {
+        padding: 45px;
+        background: linear-gradient(145deg, #f4fff4, #ddf8e2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .login-brand img {
+        width: min(270px, 80%);
+        max-height: 230px;
+        object-fit: contain;
+        margin-bottom: 15px;
+    }
+
+    .login-brand h1 {
+        color: var(--green);
+        font-size: 30px;
+        margin-bottom: 4px;
+    }
+
+    .login-brand p {
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .login-form-panel {
+        padding: 45px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .login-form-panel h2 {
+        color: var(--green);
+        font-size: 28px;
+        margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+        color: var(--muted);
+        margin-bottom: 24px;
+        font-size: 14px;
+    }
+
+    .role-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .role-tab {
+        border: 0;
+        background: #fff;
+        color: var(--text);
+        padding: 12px;
+        cursor: pointer;
+        font-weight: 700;
+    }
+
+    .role-tab.active {
+        background: var(--green);
+        color: #fff;
+    }
+
+    .login-form { display: none; }
+    .login-form.active { display: block; animation: fade .25s ease; }
+
+    .field {
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+    .field input {
+        width: 100%;
+        border: 2px solid var(--border);
+        border-radius: 11px;
+        padding: 14px 44px 14px 15px;
+        outline: none;
+        background: #fff;
+    }
+
+    .field input:focus { border-color: var(--green); }
+
+    .show-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        color: var(--green);
+    }
+
+    .primary-btn {
+        width: 100%;
+        border: 0;
+        border-radius: 11px;
+        background: var(--green);
+        color: #fff;
+        padding: 14px;
+        cursor: pointer;
+        font-weight: 800;
+        box-shadow: 0 7px 16px rgba(0,107,53,.18);
+        transition: .2s;
+    }
+
+    .primary-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+    .error-msg {
+        min-height: 22px;
+        color: var(--danger);
+        font-size: 14px;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    /* ================= NAV ================= */
+    nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        min-height: 82px;
+        padding: 10px 5%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        background: rgba(241,255,242,.97);
+        border-bottom: 2px solid #bde1c5;
+        box-shadow: 0 3px 15px rgba(0,75,35,.08);
+        backdrop-filter: blur(8px);
+    }
+
+    .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .logo-img { width: 56px; height: 56px; object-fit: contain; }
+
+    .logo-main {
+        display: block;
+        color: var(--green);
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    .logo-sub {
+        display: block;
+        font-size: 11px;
+        color: var(--text);
+        font-weight: 700;
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+    }
+
+    .nav-home {
+        color: var(--green);
+        text-decoration: none;
+        font-weight: 800;
+    }
+
+    .profile {
+        border: 2px solid var(--green);
+        border-radius: 25px;
+        padding: 7px 18px;
+        color: var(--green);
+        background: #f5fff5;
+        font-weight: 800;
+    }
+
+    .logout-btn {
+        border: 0;
+        border-radius: 8px;
+        padding: 9px 17px;
+        background: #ed4c55;
+        color: white;
+        cursor: pointer;
+        font-weight: 800;
+    }
+
+    .logout-btn:hover { background: #c93640; }
+
+    /* ================= HERO ================= */
+    .hero {
+        min-height: 475px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        background-image: url('cccdo logo-hero.jpg');
+        background-size: cover;
+        
+    }
+
+    .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0;
+        height: 90px;
+        background: linear-gradient(transparent, var(--mint));
+    }
+
+    .hero-content {
+        width: min(1180px, 90%);
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+        padding: 60px 0 90px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .hero-text {
+        width: min(650px, 100%);
+        color: white;
+    }
+
+    .hero h1 {
+        font-size: clamp(38px, 5vw, 62px);
+        line-height: 1.05;
+        color: var(--gold);
+        text-shadow: 2px 3px 4px rgba(0,0,0,.45);
+        margin-bottom: 18px;
+    }
+
+    .hero-motto {
+        font-size: 20px;
+        font-weight: 800;
+        font-style: italic;
+        margin-bottom: 18px;
+    }
+
+    .hero-description {
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.6;
+        margin-bottom: 25px;
+        text-shadow: 1px 2px 3px rgba(0,0,0,.6);
+    }
+
+
+    .search-results {
+        display: none;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 8px);
+        max-height: 360px;
+        overflow-y: auto;
+        background: #fff;
+        border: 2px solid var(--green);
+        border-radius: 12px;
+        box-shadow: 0 12px 28px rgba(0,0,0,.16);
+        z-index: 10001;
+    }
+    .search-result-item {
+        width: 100%;
+        border: 0;
+        border-bottom: 1px solid #e5eae7;
+        background: #fff;
+        padding: 13px 16px;
+        text-align: left;
+        cursor: pointer;
+    }
+    .search-result-item:last-child { border-bottom: 0; }
+    .search-result-item:hover { background: #f1f7f3; }
+    .search-result-title { font-weight: 900; color: var(--green-dark); margin-bottom: 4px; }
+    .search-result-meta { font-size: 13px; color: #66736b; }
+    .search-no-results { padding: 18px; text-align: center; color: #66736b; font-weight: 700; }
+    .search-wrapper { position: relative; z-index: 10000; }
+    .hero { overflow: visible; z-index: 100; }
+
+    .search-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px;
+        background: #fff;
+        border: 3px solid var(--green);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+
+    .search-container input {
+        min-width: 0;
+        flex: 1;
+        border: 0;
+        outline: 0;
+        padding: 13px 15px;
+        color: var(--text);
+        background: transparent;
+        font-weight: 700;
+    }
+
+    .clear-btn {
+        border: 0;
+        background: transparent;
+        color: #758078;
+        cursor: pointer;
+        font-size: 23px;
+        display: none;
+    }
+
+    .search-btn {
+        border: 0;
+        background: var(--green);
+        color: white;
+        padding: 13px 26px;
+        border-radius: 9px;
+        cursor: pointer;
+        font-weight: 900;
+    }
+
+    .search-btn:hover { background: var(--green-dark); }
+
+    /* ================= MAIN ================= */
+    main {
+        width: min(1120px, 90%);
+        margin: 0 auto;
+        padding: 38px 0 80px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .section-header h2 {
+        font-size: clamp(26px, 4vw, 34px);
+        color: var(--green);
+    }
+
+    .departments {
+        display: flex;
+        flex-direction: column;
+        gap: 17px;
+    }
+
+    .dept-card {
+        background: white;
+        border: 2px solid #d4e7d9;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,70,35,.05);
+        transition: .25s;
+    }
+
+    .dept-card:hover {
+        border-color: #9ccfac;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+
+    .dept-header {
+        padding: 24px 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .dept-icon-title {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+    }
+
+    .dept-icon { font-size: 31px; }
+
+    .dept-card h3 {
+        color: var(--green);
+        font-size: 19px;
+    }
+
+    .dept-toggle {
+        color: var(--green);
+        font-size: 20px;
+        transition: transform .25s;
+    }
+
+    .dept-card.open .dept-toggle { transform: rotate(180deg); }
+
+    .programs {
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 28px;
+        transition: max-height .4s ease, padding .3s ease;
+    }
+
+    .dept-card.open .programs {
+        max-height: 1200px;
+        padding-bottom: 18px;
+    }
+
+    .program-item {
+        background: var(--green-soft);
+        border-left: 5px solid var(--gold);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        padding: 13px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .program-item:hover { background: #dff5e4; padding-left: 20px; }
+
+    .program-item h4 {
+        color: var(--green);
+        font-size: 15px;
+    }
+
+    .lesson-count {
+        white-space: nowrap;
+        background: var(--green);
+        color: white;
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    /* ================= UPLOAD BANNER ================= */
+    .teacher-section {
+        margin-top: 65px;
+        padding: 38px 50px;
+        border-radius: 55px;
+        background: linear-gradient(135deg, var(--green-deep), #006c37);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 25px;
+        box-shadow: 0 15px 35px rgba(0,76,35,.17);
+    }
+
+    .teacher-section h2 { font-size: 27px; margin-bottom: 5px; }
+    .teacher-section p { font-weight: 700; color: #e2f5e5; }
+
+    .upload-btn, .upload-inline-btn {
+        border: 0;
+        background: var(--gold);
+        color: var(--green-deep);
+        padding: 14px 25px;
+        border-radius: 11px;
+        cursor: pointer;
+        font-weight: 900;
+        box-shadow: 0 5px 12px rgba(0,0,0,.15);
+    }
+
+    .upload-btn:hover, .upload-inline-btn:hover {
+        background: #ffe052;
+        transform: translateY(-1px);
+    }
+
+    /* ================= PORTAL ================= */
+    .program-portal { display: none; animation: fade .35s ease; }
+    .program-portal.active { display: block; }
+
+    .back-btn {
+        display: inline-block;
+        text-decoration: none;
+        color: var(--green);
+        border: 2px solid var(--green);
+        border-radius: 9px;
+        padding: 8px 15px;
+        font-weight: 800;
+        margin-bottom: 20px;
+    }
+
+    .back-btn:hover { background: var(--green); color: white; }
+
+    .program-header {
+        background: white;
+        border-radius: 17px;
+        border: 2px solid var(--border);
+        padding: 28px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 18px rgba(0,70,35,.06);
+    }
+
+    .program-header h2 { color: var(--green); margin-bottom: 4px; font-size: 26px; }
+    .program-header p { color: var(--muted); }
+
+    .lessons-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(285px, 1fr));
+        gap: 20px;
+    }
+
+    .lesson-card {
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,70,35,.06);
+        animation: rise .35s ease both;
+    }
+
+    .lesson-top {
+        padding: 15px 18px;
+        background: var(--green-soft);
+        border-bottom: 2px solid var(--green);
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .file-type {
+        border: 1px solid var(--green);
+        background: white;
+        color: var(--green);
+        border-radius: 6px;
+        padding: 4px 9px;
+        font-size: 11px;
+        font-weight: 900;
+    }
+
+    .lesson-body { padding: 19px; }
+    .lesson-body h3 { color: var(--green); font-size: 18px; margin-bottom: 8px; }
+    .lesson-body p { color: var(--muted); font-size: 14px; margin-bottom: 13px; }
+
+    .lesson-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 15px;
+    }
+
+    .lesson-actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+    }
+
+    .view-btn, .delete-btn {
+        border: 0;
+        text-align: center;
+        border-radius: 9px;
+        padding: 11px;
+        cursor: pointer;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .view-btn { background: var(--green); color: white; }
+    .view-btn:hover { background: var(--green-dark); }
+
+    .delete-btn { background: #ffe6e8; color: var(--danger); }
+    .delete-btn:hover { background: #ffd0d4; }
+
+    .admin-lesson-actions { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .edit-btn, .hide-btn { border:0; border-radius:9px; padding:11px 12px; cursor:pointer; font-weight:800; }
+    .edit-btn { background:#e7f0ff; color:#2457a6; }
+    .edit-btn:hover { background:#d5e4ff; }
+    .hide-btn { background:#fff3cd; color:#856404; }
+    .hide-btn:hover { background:#ffe8a1; }
+    .uploader-table { width:100%; border-collapse:collapse; margin:0 0 18px; background:#fff; border:2px solid var(--border); font-size:13px; }
+    .uploader-table th, .uploader-table td { padding:8px 10px; text-align:left; border-bottom:1px solid var(--border); }
+    .uploader-table th { color:var(--green); background:var(--green-soft); font-weight:900; }
+    .uploader-table tr:last-child td { border-bottom:0; }
+    .hidden-lesson { opacity:.68; border-style:dashed; }
+    .hidden-badge { display:inline-block; margin-left:7px; padding:3px 7px; border-radius:999px; background:#fff3cd; color:#856404; font-size:10px; font-weight:900; }
+
+    .empty-state {
+        text-align: center;
+        padding: 55px 25px;
+        background: white;
+        border: 2px dashed var(--border);
+        border-radius: 17px;
+        color: var(--muted);
+    }
+
+    .empty-state h3 { color: var(--green); margin-bottom: 8px; }
+
+    /* ================= MODAL ================= */
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 3000;
+        padding: 20px;
+        background: rgba(0,35,18,.65);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-content {
+        width: min(570px, 100%);
+        max-height: 92vh;
+        overflow: auto;
+        background: white;
+        border-radius: 20px;
+        border: 3px solid var(--green);
+        padding: 28px;
+        box-shadow: 0 25px 70px rgba(0,0,0,.25);
+        animation: rise .25s ease;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid var(--green-soft);
+        padding-bottom: 13px;
+        margin-bottom: 22px;
+    }
+
+    .modal-header h2 { color: var(--green); }
+
+    .close {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font-size: 29px;
+        cursor: pointer;
+    }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+        display: block;
+        color: var(--green);
+        font-size: 14px;
+        font-weight: 900;
+        margin-bottom: 7px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        outline: none;
+        background: white;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--green); }
+
+    .form-group textarea { min-height: 95px; resize: vertical; }
+
+    .file-note {
+        background: var(--green-soft);
+        border-radius: 9px;
+        padding: 10px;
+        color: var(--text);
+        font-size: 12px;
+        margin-top: 7px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        border: 0;
+        background: var(--green);
+        color: white;
+        border-radius: 10px;
+        padding: 14px;
+        cursor: pointer;
+        font-weight: 900;
+    }
+
+    .submit-btn:hover { background: var(--green-dark); }
+
+    /* ================= TOAST ================= */
+    .toast {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 5000;
+        max-width: min(390px, calc(100% - 40px));
+        padding: 14px 17px;
+        border-radius: 11px;
+        background: var(--green-deep);
+        color: white;
+        box-shadow: 0 12px 30px rgba(0,0,0,.22);
+        transform: translateY(130px);
+        opacity: 0;
+        transition: .3s;
+        font-weight: 700;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ================= LOADING INDICATOR ================= */
+    .loading-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(0, 35, 18, .22);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity .25s ease, visibility .25s ease;
+    }
+
+    .loading-overlay.show {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    .loading-box {
+        min-width: 190px;
+        max-width: min(330px, 90vw);
+        background: white;
+        border: 3px solid var(--green);
+        border-radius: 18px;
+        padding: 22px 24px;
+        text-align: center;
+        box-shadow: 0 18px 55px rgba(0,0,0,.22);
+        transform: translateY(8px) scale(.97);
+        transition: transform .25s ease;
+    }
+
+    .loading-overlay.show .loading-box {
+        transform: translateY(0) scale(1);
+    }
+
+    .loading-spinner {
+        width: 42px;
+        height: 42px;
+        margin: 0 auto 12px;
+        border: 4px solid var(--green-soft);
+        border-top-color: var(--green);
+        border-radius: 50%;
+        animation: loadingSpin .8s linear infinite;
+    }
+
+    .loading-text {
+        color: var(--green-deep);
+        font-weight: 900;
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+    @keyframes loadingSpin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ================= FOOTER ================= */
+    footer {
+        background: var(--green-deep);
+        color: white;
+        text-align: center;
+        padding: 35px 20px;
+        border-top: 4px solid var(--green);
+    }
+
+    .footer-logo { width: 90px; height: 90px; object-fit: contain; margin-bottom: 6px; }
+    .footer-motto { color: var(--gold); font-size: 20px; font-weight: 900; font-style: italic; }
+    footer p:last-child { margin-top: 6px; font-size: 13px; }
+
+    @keyframes rise {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @media (max-width: 760px) {
+        .login-card { grid-template-columns: 1fr; }
+        .login-brand { padding: 25px; }
+        .login-brand img { width: 180px; max-height: 145px; }
+        .login-form-panel { padding: 28px 24px; }
+        nav { padding: 8px 4%; }
+        .logo-sub { display: none; }
+        .logo-img { width: 48px; height: 48px; }
+        .logo-main { font-size: 17px; }
+        .nav-links { gap: 8px; }
+        .nav-home { display: none; }
+        .profile { padding: 6px 12px; }
+        .logout-btn { padding: 8px 12px; }
+        .hero { min-height: 500px; }
+        .hero-content { width: 88%; justify-content: center; text-align: center; }
+        .hero-text { width: 100%; }
+        .hero h1 { font-size: 40px; }
+        .search-container { flex-wrap: wrap; }
+        .search-container input { flex-basis: 100%; }
+        .search-btn { flex: 1; }
+        main { width: 90%; }
+        .teacher-section { border-radius: 30px; padding: 30px 25px; text-align: center; flex-direction: column; }
+        .program-item { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (max-width: 430px) {
+        .hero h1 { font-size: 34px; }
+        .hero-description { font-size: 16px; }
+        .dept-header { padding: 20px 18px; }
+        .programs { padding-left: 18px; padding-right: 18px; }
+        .dept-card.open .programs { padding-bottom: 10px; }
+        .section-header h2 { font-size: 25px; }
+        .teacher-section h2 { font-size: 23px; }
+    }
+</style>
+</head>
+
+<body>
+
+<!-- ================= LOGIN ================= -->
+<section class="login-screen" id="loginScreen">
+    <div class="login-card">
+        <div class="login-brand">
+            <img src="C:\Users\USER\Desktop\Mae Postrano\cccdo-bg.png" alt="City College of Cagayan de Oro logo">
+            <h1>LessonVault</h1>
+            <p>City College of Cagayan de Oro • Est. 2023</p>
+            <p style="margin-top:10px;color:#006b35;font-weight:800;">"Aim Higher"</p>
+        </div>
+
+        <div class="login-form-panel">
+            <h2>Welcome Back</h2>
+            <p class="login-subtitle">Sign in to access the LessonVault learning repository.</p>
+
+            <div class="role-tabs">
+                <button class="role-tab active" data-role="student" onclick="switchRole('student')">Student</button>
+                <button class="role-tab" data-role="admin" onclick="switchRole('admin')">Admin</button>
+            </div>
+
+            <div class="login-form active" id="studentForm">
+                <div class="field">
+                    <input type="password" id="studentPass" placeholder="Enter Student Passcode" autocomplete="current-password">
+                    <button class="show-password" type="button" onclick="togglePassword('studentPass', this)">👁</button>
+                </div>
+                <button class="primary-btn" onclick="studentLogin()">Sign In as Student</button>
+                <p class="error-msg" id="studentError"></p>
+            </div>
+
+            <div class="login-form" id="adminForm">
+                <div class="field">
+                    <input type="password" id="adminPass" placeholder="Enter Admin Passcode" autocomplete="current-password">
+                    <button class="show-password" type="button" onclick="togglePassword('adminPass', this)">👁</button>
+                </div>
+                <button class="primary-btn" onclick="adminLogin()">Sign In as Admin</button>
+                <p class="error-msg" id="adminError"></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= APP ================= -->
+<div id="mainApp" class="hidden">
+
+    <nav>
+        <a href="#dashboard" class="logo-container" onclick="goHome()">
+            <img src="C:\Users\USER\Desktop\Mae Postrano\cccdo-logo.png" alt="CCDO Logo" class="logo-img">
+            <span>
+                <span class="logo-main">LessonVault</span>
+                <span class="logo-sub">City College of Cagayan de Oro • Aim Higher</span>
+            </span>
+        </a>
+
+        <div class="nav-links">
+            <a class="nav-home" href="#dashboard" onclick="goHome()">Dashboard</a>
+            <span class="profile" id="userRoleLabel">Student</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <section class="hero" id="dashboard">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Your Lessons,<br>Always Within Reach</h1>
+                <p class="hero-motto">"Aim Higher"</p>
+                <p class="hero-description">
+                    LessonVault — official learning repository of the
+                    <strong>City College of Cagayan de Oro</strong>.
+                </p>
+
+                <div class="search-wrapper">
+                    <div class="search-container">
+                        <input type="text" id="searchInput"
+                               placeholder="Search departments, programs, or lessons..."
+                               oninput="searchEverything()" autocomplete="off">
+                        <button class="clear-btn" id="clearBtn" onclick="clearSearch()">×</button>
+                        <button class="search-btn" onclick="searchEverything()">Search</button>
+                    </div>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <div id="departments-view">
+            <div class="section-header">
+                <h2>📚 Academic Departments</h2>
+            </div>
+
+            <div class="departments" id="departments-list">
+
+                <div class="dept-card" data-dept="College of Education">
+                    <div class="dept-header" onclick="toggleDept(this.parentElement)">
+                        <div class="dept-icon-title"><span class="dept-icon">🎓</span><h3>College of Education</h3></div>
+                        <span class="dept-toggle">▼</span>
+                    </div>
+                    <div class="programs">
+                        <div class="program-item" data-program="Bachelor of Technology and Livelihood Education — Major in Industrial Arts" onclick="openProgramPortal(this)">
+                            <h4>• Bachelor of Technology and Livelihood Education (Major in Industrial Arts)</h4>
+                            <span class="lesson-count" id="count-ed-1">0 lessons</span>
+                        </div>
+                        <div class="program-item" data-program="Bachelor of Technical-Vocational Teacher Education — Major in Electrical Technology" onclick="openProgramPortal(this)">
+                            <h4>• Bachelor of Technical-Vocational Teacher Education (Major in Electrical Technology)</h4>
+                            <span class="lesson-count" id="count-ed-2">0 lessons</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dept-card" data-dept="College of Arts and Sciences">
+                    <div class="dept-header" onclick="toggleDept(this.parentElement)">
+                        <div class="dept-icon-title"><span class="dept-icon">📖</span><h3>College of Arts and Sciences</h3></div>
+                        <span class="dept-toggle">▼</span>
+                    </div>
+                    <div class="programs">
+                        <div class="program-item" data-program="Bachelor of Arts in Communication" onclick="openProgramPortal(this)">
+                            <h4>• Bachelor of Arts in Communication</h4>
+                            <span class="lesson-count" id="count-cas-1">0 lessons</span>
+                        </div>
+                        <div class="program-item" data-program="Bachelor of Science in Social Work" onclick="openProgramPortal(this)">
+                            <h4>• Bachelor of Science in Social Work</h4>
+                            <span class="lesson-count" id="count-cas-2">0 lessons</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dept-card" data-dept="College of Business and Management">
+                    <div class="dept-header" onclick="toggleDept(this.parentElement)">
+                        <div class="dept-icon-title"><span class="dept-icon">💼</span><h3>College of Business and Management</h3></div>
+                        <span class="dept-toggle">▼</span>
+                    </div>
+                    <div class="programs">
+                        <div class="program-item" data-program="Bachelor of Science in Entrepreneurship" onclick="openProgramPortal(this)">
+                            <h4>• Bachelor of Science in Entrepreneurship</h4>
+                            <span class="lesson-count" id="count-cbm-1">0 lessons</span>
+                        </div>
+                        <div class="program-item" data-program="Bachelor of Science in Office Administration" onclick="openProgramPortal(this)">
+                            <h4>• Bachelor of Science in Office Administration</h4>
+                            <span class="lesson-count" id="count-cbm-2">0 lessons</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dept-card" data-dept="Technical Skills and Technology Institute (TSTI) — TESDA">
+                    <div class="dept-header" onclick="toggleDept(this.parentElement)">
+                        <div class="dept-icon-title"><span class="dept-icon">🛠️</span><h3>TSTI — TESDA</h3></div>
+                        <span class="dept-toggle">▼</span>
+                    </div>
+                    <div class="programs">
+                        <div class="program-item" data-program="Carpentry NC II" onclick="openProgramPortal(this)"><h4>• Carpentry NC II</h4><span class="lesson-count" id="count-tsti-1">0 lessons</span></div>
+                        <div class="program-item" data-program="Plumbing NC I & NC II" onclick="openProgramPortal(this)"><h4>• Plumbing NC I & NC II</h4><span class="lesson-count" id="count-tsti-2">0 lessons</span></div>
+                        <div class="program-item" data-program="Shielded Metal Arc Welding (SMAW) NC I & NC II" onclick="openProgramPortal(this)"><h4>• SMAW NC I & NC II</h4><span class="lesson-count" id="count-tsti-3">0 lessons</span></div>
+                        <div class="program-item" data-program="Electrical Installation and Maintenance (EIM) NC II" onclick="openProgramPortal(this)"><h4>• EIM NC II</h4><span class="lesson-count" id="count-tsti-4">0 lessons</span></div>
+                        <div class="program-item" data-program="Housekeeping NC II" onclick="openProgramPortal(this)"><h4>• Housekeeping NC II</h4><span class="lesson-count" id="count-tsti-5">0 lessons</span></div>
+                        <div class="program-item" data-program="Barangay Health Services (BHS) NC II" onclick="openProgramPortal(this)"><h4>• BHS NC II</h4><span class="lesson-count" id="count-tsti-6">0 lessons</span></div>
+                        <div class="program-item" data-program="Bookkeeping NC II" onclick="openProgramPortal(this)"><h4>• Bookkeeping NC II</h4><span class="lesson-count" id="count-tsti-7">0 lessons</span></div>
+                        <div class="program-item" data-program="Trainers' Methodology NC II" onclick="openProgramPortal(this)"><h4>• Trainers' Methodology NC II</h4><span class="lesson-count" id="count-tsti-8">0 lessons</span></div>
+                        <div class="program-item" data-program="Emergency Medical Services NC II" onclick="openProgramPortal(this)"><h4>• Emergency Medical Services NC II</h4><span class="lesson-count" id="count-tsti-9">0 lessons</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="teacher-section" id="uploadSection">
+                <div>
+                    <h2>Are you a Teacher/Admin?</h2>
+                    <p>Admins can upload lessons to a program. Students see published lessons here.</p>
+                </div>
+                <button class="upload-btn" onclick="openUploadModal()">+ Upload a Lesson</button>
+            </section>
+        </div>
+
+        <div id="program-portal-view" class="program-portal">
+            <a href="#" class="back-btn" onclick="goBackToDepts(); return false;">← Back to Departments</a>
+
+            <div class="program-header">
+                <h2 id="current-program-name">Program Name</h2>
+                <p id="current-dept-name">Department Name</p>
+            </div>
+
+            <div class="lessons-grid" id="program-lessons-container"></div>
+
+            <div class="empty-state" id="empty-lessons">
+                <h3>📂 No Lessons Yet</h3>
+                <p style="margin-bottom:18px;">Lessons uploaded to this program will appear here.</p>
+                <button class="upload-inline-btn" onclick="openUploadModal()">+ Upload First Lesson</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ================= UPLOAD MODAL ================= -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Upload Lesson</h2>
+                <button class="close" onclick="closeUploadModal()">×</button>
+            </div>
+
+            <form id="uploadForm" onsubmit="uploadLesson(event)">
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="uploadDept" required onchange="updateProgramOptions()">
+                        <option value="">Select Department</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Program</label>
+                    <select id="uploadProgram" required>
+                        <option value="">Select Program</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Lesson Title</label>
+                    <input type="text" id="lessonTitle" placeholder="e.g. Chapter 1: Introduction" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Teacher / Uploader Name</label>
+                    <input type="text" id="uploaderName" placeholder="Enter teacher/uploader name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="lessonDescription" placeholder="Briefly describe this lesson..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Lesson File</label>
+                    <input type="file" id="lessonFile" accept=".pdf,.doc,.docx,.ppt,.pptx" required>
+                    <div class="file-note">Maximum size: 300 MB. Large lesson files are uploaded to Google Drive in resumable chunks. Lesson information is stored in a Google Sheet.</div>
+                </div>
+
+                <button class="submit-btn" type="submit">Upload Lesson</button>
+                <p class="error-msg" id="uploadError"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= EDIT LESSON MODAL ================= -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Edit Lesson</h2><button class="close" onclick="closeEditModal()">×</button></div>
+            <form id="editForm" onsubmit="saveEditedLesson(event)">
+                <div class="form-group"><label>Lesson Title</label><input type="text" id="editLessonTitle" required></div>
+                <div class="form-group"><label>Teacher / Uploader Name</label><input type="text" id="editUploaderName" required></div>
+                <div class="form-group"><label>Description</label><textarea id="editLessonDescription" required></textarea></div>
+                <div class="form-group"><label>Replace Lesson File (optional)</label><input type="file" id="editLessonFile" accept=".pdf,.doc,.docx,.ppt,.pptx"><div class="file-note">Leave empty to keep the existing lesson file. Replacement files can be up to 300 MB.</div></div>
+                <button class="submit-btn" type="submit">Save Changes</button><p class="error-msg" id="editError"></p>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <img src="C:\Users\USER\Desktop\Mae Postrano\cccdo-logo.png" alt="CCDO Logo" class="footer-logo" style="width:100px;height:100px;">
+        <p>© 2026 City College of Cagayan de Oro • LessonVault</p>
+    </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="loading-overlay" id="loadingOverlay" aria-hidden="true">
+    <div class="loading-box" role="status" aria-live="polite">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Loading… Please wait.</div>
+    </div>
+</div>
+
+<script>
+"use strict";
+
+/*
+ * LESSONVAULT — GOOGLE DRIVE VERSION
+ *
+ * IMPORTANT:
+ * 1. This HTML no longer uses Firebase/Firestore/Storage.
+ * 2. Set GOOGLE_APPS_SCRIPT_URL below after you deploy the companion
+ *    LessonVault_GoogleAppsScript.gs as a Web App.
+ * 3. The Apps Script stores lesson files in Google Drive and lesson
+ *    information in a Google Sheet.
+ */
+
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2rxeQtsPXP1x98Xynarb9rSKt35OcIU-Mekbwel1n8i7f9QabFrQkI5iYGi7lCyEj/exec";
+
+const PASSCODES = {
+    student: "cccdo1234",
+    admin: "cccdoadmin1234"
+};
+
+const programOptions = {
+    "College of Education": [
+        "Bachelor of Technology and Livelihood Education — Major in Industrial Arts",
+        "Bachelor of Technical-Vocational Teacher Education — Major in Electrical Technology"
+    ],
+    "College of Arts and Sciences": [
+        "Bachelor of Arts in Communication",
+        "Bachelor of Science in Social Work"
+    ],
+    "College of Business and Management": [
+        "Bachelor of Science in Entrepreneurship",
+        "Bachelor of Science in Office Administration"
+    ],
+    "Technical Skills and Technology Institute (TSTI) — TESDA": [
+        "Carpentry NC II",
+        "Plumbing NC I & NC II",
+        "Shielded Metal Arc Welding (SMAW) NC I & NC II",
+        "Electrical Installation and Maintenance (EIM) NC II",
+        "Housekeeping NC II",
+        "Barangay Health Services (BHS) NC II",
+        "Bookkeeping NC II",
+        "Trainers' Methodology NC II",
+        "Emergency Medical Services NC II"
+    ]
+};
+
+let currentUser = sessionStorage.getItem("lessonVaultUser") || null;
+let allLessons = {};
+let currentProgram = null;
+let currentDept = null;
+let lessonsLoaded = false;
+let editingLessonId = null;
+let loadingDepth = 0;
+let loadingStartedAt = 0;
+let loadingHideTimer = null;
+
+function showLoading(message = "Loading… Please wait.") {
+    const overlay = document.getElementById("loadingOverlay");
+    const text = document.getElementById("loadingText");
+    if (!overlay) return;
+
+    clearTimeout(loadingHideTimer);
+    loadingDepth++;
+    if (text) text.textContent = message;
+    if (!loadingStartedAt) loadingStartedAt = Date.now();
+    overlay.classList.add("show");
+    overlay.setAttribute("aria-hidden", "false");
+}
+
+function hideLoading() {
+    const overlay = document.getElementById("loadingOverlay");
+    if (!overlay) return;
+
+    loadingDepth = Math.max(0, loadingDepth - 1);
+    if (loadingDepth > 0) return;
+
+    const elapsed = Date.now() - loadingStartedAt;
+    const remaining = Math.max(0, 220 - elapsed);
+
+    loadingHideTimer = setTimeout(() => {
+        overlay.classList.remove("show");
+        overlay.setAttribute("aria-hidden", "true");
+        loadingStartedAt = 0;
+    }, remaining);
+}
+
+function apiReady() {
+    return GOOGLE_APPS_SCRIPT_URL &&
+           GOOGLE_APPS_SCRIPT_URL.startsWith("https://script.google.com/");
+}
+
+async function apiRequest(action, data = {}) {
+    if (!apiReady()) {
+        throw new Error("Google Apps Script URL has not been added yet.");
+    }
+
+    showLoading(
+        action === "listLessons" ? "Loading lessons… Please wait." :
+        action === "uploadLesson" ? "Uploading lesson… Please wait." :
+        action === "updateLesson" ? "Saving changes… Please wait." :
+        action === "setHidden" ? "Updating lesson visibility… Please wait." :
+        action === "deleteLesson" ? "Deleting lesson… Please wait." :
+        "Working… Please wait."
+    );
+
+    /*
+     * Reliable transport for local Android HTML files:
+     * 1) POST through a hidden iframe so the upload can reach Apps Script.
+     * 2) Apps Script stores the result in CacheService.
+     * 3) If postMessage() cannot get back to this local file, JSONP polling
+     *    retrieves the stored result without requiring CORS.
+     */
+    return new Promise((resolve, reject) => {
+        const requestId =
+            "lv_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+
+        let finished = false;
+        let pollTimer = null;
+        let pollCount = 0;
+        const maxPolls = 40;
+
+        const iframe = document.createElement("iframe");
+        iframe.name = requestId;
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = GOOGLE_APPS_SCRIPT_URL;
+        form.target = requestId;
+        form.style.display = "none";
+
+        const fields = {
+            action,
+            requestId,
+            ...data
+        };
+
+        Object.entries(fields).forEach(([key, value]) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = value == null ? "" : String(value);
+            form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+
+        const callbackName = "lessonVaultCallback_" +
+            Date.now() + "_" + Math.random().toString(36).slice(2);
+
+        const cleanup = () => {
+            hideLoading();
+            window.removeEventListener("message", onMessage);
+            clearTimeout(timeout);
+            if (pollTimer) clearTimeout(pollTimer);
+            delete window[callbackName];
+            const oldScript = document.getElementById(callbackName);
+            if (oldScript) oldScript.remove();
+            form.remove();
+            iframe.remove();
+        };
+
+        const finish = (result) => {
+            if (finished) return;
+            finished = true;
+            cleanup();
+
+            if (!result || typeof result !== "object") {
+                reject(new Error("Google Apps Script returned an invalid response."));
+                return;
+            }
+
+            if (!result.success) {
+                reject(new Error(result.error || "Google Drive operation failed."));
+                return;
+            }
+
+            resolve(result);
+        };
+
+        const fail = (message) => {
+            if (finished) return;
+            finished = true;
+            cleanup();
+            reject(new Error(message));
+        };
+
+        const onMessage = (event) => {
+            const message = event.data;
+
+            if (!message ||
+                message.type !== "LessonVaultResponse" ||
+                message.requestId !== requestId) {
+                return;
+            }
+
+            finish(message.payload);
+        };
+
+        window.addEventListener("message", onMessage);
+
+        const pollStatus = () => {
+            if (finished) return;
+            pollCount++;
+
+            window[callbackName] = (response) => {
+                if (finished) return;
+
+                if (response && response.success && response.found && response.result) {
+                    finish(response.result);
+                    return;
+                }
+
+                if (pollCount >= maxPolls) {
+                    fail("Google Apps Script received the request, but the webpage could not confirm the result. Please check the Lessons sheet before trying the upload again.");
+                    return;
+                }
+
+                pollTimer = setTimeout(pollStatus, 1500);
+            };
+
+            const script = document.createElement("script");
+            script.id = callbackName;
+            script.async = true;
+            script.src = GOOGLE_APPS_SCRIPT_URL +
+                "?action=requestStatus" +
+                "&requestId=" + encodeURIComponent(requestId) +
+                "&callback=" + encodeURIComponent(callbackName) +
+                "&_=" + Date.now();
+
+            script.onerror = () => {
+                if (finished) return;
+                if (pollCount >= maxPolls) {
+                    fail("Could not contact the Google Apps Script Web App. Please check the Web App deployment and /exec URL.");
+                } else {
+                    pollTimer = setTimeout(pollStatus, 1500);
+                }
+            };
+
+            document.head.appendChild(script);
+        };
+
+        const timeout = setTimeout(() => {
+            fail("Google Apps Script timed out. Please check the Lessons sheet and Google Drive before uploading the same file again.");
+        }, 180000);
+
+        try {
+            form.submit();
+            /* Give the POST a moment to execute, then begin confirmation polling. */
+            pollTimer = setTimeout(pollStatus, 1500);
+        } catch (error) {
+            fail(error.message || "Could not send the request.");
+        }
+    });
+}
+async function loadLessonsFromDrive() {
+    if (!apiReady()) {
+        lessonsLoaded = false;
+        updateAllCounts();
+        searchEverything();
+        return;
+    }
+
+    const result = await apiRequest("listLessons");
+    const grouped = {};
+
+    (result.lessons || []).forEach(lesson => {
+        const program = lesson.program || "";
+        if (!program) return;
+
+        lesson.hidden = lesson.hidden === true || String(lesson.hidden).toLowerCase() === "true";
+
+        if (!grouped[program]) grouped[program] = [];
+        grouped[program].push(lesson);
+    });
+
+    Object.keys(grouped).forEach(program => {
+        grouped[program].sort((a, b) =>
+            new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        );
+    });
+
+    allLessons = grouped;
+    lessonsLoaded = true;
+    updateAllCounts();
+    searchEverything();
+
+    if (currentProgram) await renderProgramLessons();
+}
+
+const MAX_UPLOAD_BYTES = 300 * 1024 * 1024;
+const UPLOAD_CHUNK_BYTES = 4 * 1024 * 1024; // 4 MiB. Each chunk is sent through Apps Script as Base64, then streamed to Google Drive.
+
+function formatBytes(bytes) {
+    if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
+    const units = ["B", "KB", "MB", "GB"];
+    const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+}
+
+function arrayBufferToBase64(buffer) {
+    const bytes = new Uint8Array(buffer);
+    const sliceSize = 0x8000;
+    let binary = "";
+
+    for (let offset = 0; offset < bytes.length; offset += sliceSize) {
+        const slice = bytes.subarray(offset, Math.min(offset + sliceSize, bytes.length));
+        binary += String.fromCharCode.apply(null, slice);
+    }
+
+    return btoa(binary);
+}
+
+/*
+ * IMPORTANT: Do not PUT directly to the Google Drive session URL from the
+ * browser. Some Android/content:// browsers block that cross-origin request
+ * and show "Failed to fetch". Instead, each small chunk is sent to the
+ * LessonVault Apps Script endpoint; Apps Script forwards that chunk to the
+ * Drive resumable session. This keeps the upload resumable while avoiding
+ * the browser CORS problem.
+ */
+async function uploadFileResumable(sessionUrl, file, progressPrefix = "Uploading lesson") {
+    let start = 0;
+    let lastProgress = -1;
+    const maxAttemptsPerChunk = 5;
+
+    while (start < file.size) {
+        const end = Math.min(start + UPLOAD_CHUNK_BYTES, file.size);
+        const chunk = file.slice(start, end);
+        const chunkLength = end - start;
+        let response = null;
+
+        for (let attempt = 1; attempt <= maxAttemptsPerChunk; attempt++) {
+            try {
+                const buffer = await chunk.arrayBuffer();
+                const chunkData = arrayBufferToBase64(buffer);
+
+                response = await apiRequest("uploadChunk", {
+                    sessionUrl,
+                    start: String(start),
+                    end: String(end - 1),
+                    totalSize: String(file.size),
+                    mimeType: file.type || "application/octet-stream",
+                    chunkData
+                });
+
+                if (response && response.status >= 200 && response.status < 300) break;
+                if (response && response.status === 308) break;
+
+                throw new Error(
+                    response && response.error
+                        ? response.error
+                        : "Google Drive did not accept the upload chunk."
+                );
+            } catch (error) {
+                if (attempt >= maxAttemptsPerChunk) {
+                    /*
+                     * One final status check prevents us from skipping a chunk
+                     * when Drive received it but the browser/App Script response
+                     * was lost.
+                     */
+                    try {
+                        response = await apiRequest("uploadChunkStatus", {
+                            sessionUrl,
+                            totalSize: String(file.size)
+                        });
+                        if (response && (response.status === 308 ||
+                            (response.status >= 200 && response.status < 300))) {
+                            break;
+                        }
+                    } catch (statusError) {
+                        throw new Error(
+                            (error.message || "Chunk upload failed.") +
+                            " Status check also failed: " +
+                            (statusError.message || statusError)
+                        );
+                    }
+
+                    throw error;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, attempt * 1500));
+            }
+        }
+
+        if (!response) {
+            throw new Error("No response received for the upload chunk.");
+        }
+
+        if (response.status === 308) {
+            const range = String(response.range || "");
+            const match = range.match(/(?:bytes=)?\s*0-(\d+)/i);
+
+            if (match) {
+                const serverEnd = Number(match[1]) + 1;
+                /*
+                 * Never move forward beyond what Drive confirms. This is the
+                 * key safety rule that prevents skipped data after a timeout.
+                 */
+                start = serverEnd;
+            } else {
+                /*
+                 * No Range means Drive did not confirm any uploaded byte.
+                 * Retry the same chunk instead of assuming it succeeded.
+                 */
+                continue;
+            }
+        } else if (response.status >= 200 && response.status < 300) {
+            if (!response.fileId) {
+                throw new Error("Google Drive finished the upload but did not return a file ID.");
+            }
+            start = file.size;
+            return { id: response.fileId, name: response.name || file.name };
+        } else {
+            throw new Error("Unexpected Google Drive upload response.");
+        }
+
+        /*
+         * Drive may report a position that is behind the browser's planned
+         * chunk boundary after a recovered request. Re-slice from the
+         * confirmed position on the next loop.
+         */
+        const percent = Math.min(100, Math.round((start / file.size) * 100));
+        if (percent !== lastProgress) {
+            lastProgress = percent;
+            const overlayText = document.getElementById("loadingText");
+            if (overlayText) {
+                overlayText.textContent = `${progressPrefix}… ${percent}% (${formatBytes(start)} / ${formatBytes(file.size)})`;
+            }
+        }
+    }
+
+    throw new Error("The upload ended without a completed Google Drive response.");
+}
+
+function formatDate(value) {
+    if (!value) return "";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+
+    return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+    });
+}
+
+/* ================= HELPERS ================= */
+
+function showToast(message) {
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.remove("show"), 3000);
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, c => ({
+        "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+    }[c]));
+}
+
+function togglePassword(id, button) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+    button.textContent = input.type === "password" ? "👁" : "🙈";
+}
+
+/* ================= LOGIN ================= */
+
+function switchRole(role) {
+    document.querySelectorAll(".role-tab").forEach(tab => {
+        tab.classList.toggle("active", tab.dataset.role === role);
+    });
+
+    document.getElementById("studentForm").classList.toggle("active", role === "student");
+    document.getElementById("adminForm").classList.toggle("active", role === "admin");
+    document.getElementById("studentError").textContent = "";
+    document.getElementById("adminError").textContent = "";
+}
+
+async function studentLogin() {
+    const input = document.getElementById("studentPass").value.trim();
+
+    if (input === PASSCODES.student) {
+        currentUser = "student";
+        sessionStorage.setItem("lessonVaultUser", "student");
+        await enterSite();
+    } else {
+        document.getElementById("studentError").textContent = "❌ Incorrect student passcode.";
+    }
+}
+
+async function adminLogin() {
+    const input = document.getElementById("adminPass").value.trim();
+
+    if (input === PASSCODES.admin) {
+        currentUser = "admin";
+        sessionStorage.setItem("lessonVaultUser", "admin");
+        await enterSite();
+    } else {
+        document.getElementById("adminError").textContent = "❌ Incorrect admin passcode.";
+    }
+}
+
+async function enterSite() {
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("mainApp").classList.remove("hidden");
+
+    document.getElementById("userRoleLabel").textContent =
+        currentUser === "admin" ? "Admin" : "Student";
+
+    document.getElementById("uploadSection").classList.toggle("hidden", currentUser !== "admin");
+
+    if (!apiReady()) {
+        showToast("⚠️ Google Drive is not connected yet. Add the Apps Script Web App URL.");
+        return;
+    }
+
+    try {
+        await loadLessonsFromDrive();
+    } catch (error) {
+        console.error(error);
+        showToast("❌ Could not load lessons from Google Drive.");
+    }
+}
+
+function logout() {
+    currentUser = null;
+    sessionStorage.removeItem("lessonVaultUser");
+    document.getElementById("loginScreen").classList.remove("hidden");
+    document.getElementById("mainApp").classList.add("hidden");
+    document.getElementById("studentPass").value = "";
+    document.getElementById("adminPass").value = "";
+    goBackToDepts();
+}
+
+/* ================= DEPARTMENTS ================= */
+
+function toggleDept(card) {
+    card.classList.toggle("open");
+}
+
+function populateDepartmentSelect() {
+    const select = document.getElementById("uploadDept");
+    select.innerHTML = '<option value="">Select Department</option>';
+
+    Object.keys(programOptions).forEach(dept => {
+        const option = document.createElement("option");
+        option.value = dept;
+        option.textContent = dept;
+        select.appendChild(option);
+    });
+}
+
+function updateProgramOptions() {
+    const dept = document.getElementById("uploadDept").value;
+    const select = document.getElementById("uploadProgram");
+
+    select.innerHTML = '<option value="">Select Program</option>';
+
+    (programOptions[dept] || []).forEach(program => {
+        const option = document.createElement("option");
+        option.value = program;
+        option.textContent = program;
+        select.appendChild(option);
+    });
+}
+
+/* ================= SEARCH ================= */
+
+function searchEverything() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const results = document.getElementById("searchResults");
+    document.getElementById("clearBtn").style.display = q ? "block" : "none";
+
+    document.querySelectorAll(".dept-card").forEach(card => {
+        const deptText = (card.dataset.dept || "").toLowerCase();
+        const deptMatch = deptText.includes(q);
+        let visible = !q || deptMatch;
+
+        card.querySelectorAll(".program-item").forEach(item => {
+            const program = (item.dataset.program || "").toLowerCase();
+            const lessons = (allLessons[item.dataset.program] || [])
+                .filter(l => currentUser === "admin" || !l.hidden);
+
+            const lessonMatch = lessons.some(l =>
+                (l.title || "").toLowerCase().includes(q) ||
+                (l.description || "").toLowerCase().includes(q) ||
+                (l.uploadedBy || "").toLowerCase().includes(q)
+            );
+
+            const match = !q || program.includes(q) || lessonMatch;
+            item.style.display = match ? "flex" : "none";
+            if (q && match) visible = true;
+        });
+
+        card.style.display = visible ? "block" : "none";
+
+        if (q && visible) card.classList.add("open");
+        if (!q) card.classList.remove("open");
+    });
+
+    if (!q) {
+        results.innerHTML = "";
+        results.style.display = "none";
+        return;
+    }
+
+    const matches = [];
+
+    Object.keys(programOptions).forEach(dept => {
+        const programs = programOptions[dept] || [];
+
+        programs.forEach(programName => {
+            const lessons = (allLessons[programName] || [])
+                .filter(l => currentUser === "admin" || !l.hidden);
+
+            const programMatch = programName.toLowerCase().includes(q);
+            const deptMatch = dept.toLowerCase().includes(q);
+
+            if (programMatch || deptMatch) {
+                matches.push({
+                    type: "Program",
+                    title: programName,
+                    dept,
+                    program: programName
+                });
+            }
+
+            lessons.forEach(lesson => {
+                const text = [lesson.title, lesson.description, lesson.uploadedBy]
+                    .join(" ")
+                    .toLowerCase();
+
+                if (text.includes(q)) {
+                    matches.push({
+                        type: "Lesson",
+                        title: lesson.title || "Untitled Lesson",
+                        dept,
+                        program: programName,
+                        uploader: lesson.uploadedBy || "Admin"
+                    });
+                }
+            });
+        });
+    });
+
+    const unique = [];
+    const seen = new Set();
+
+    matches.forEach(match => {
+        const key = `${match.type}|${match.program}|${match.title}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            unique.push(match);
+        }
+    });
+
+    if (!unique.length) {
+        results.innerHTML = '<div class="search-no-results">No results found.</div>';
+    } else {
+        results.innerHTML = unique.slice(0, 30).map(match => `
+            <button class="search-result-item" onclick="openSearchResult(${JSON.stringify(match.program)})">
+                <div class="search-result-title">${match.type === "Lesson" ? "📄 " : "📚 "}${escapeHTML(match.title)}</div>
+                <div class="search-result-meta">${escapeHTML(match.dept)} · ${escapeHTML(match.program)}${match.uploader ? " · Uploaded by " + escapeHTML(match.uploader) : ""}</div>
+            </button>
+        `).join("");
+    }
+
+    results.style.display = "block";
+}
+
+function openSearchResult(program) {
+    const item = Array.from(document.querySelectorAll(".program-item"))
+        .find(el => el.dataset.program === program);
+
+    if (item) {
+        document.getElementById("searchResults").style.display = "none";
+        openProgramPortal(item);
+    }
+}
+
+function clearSearch() {
+    document.getElementById("searchInput").value = "";
+    searchEverything();
+    document.getElementById("searchInput").focus();
+}
+
+/* ================= PROGRAM PORTAL ================= */
+
+function openProgramPortal(el) {
+    currentProgram = el.dataset.program;
+    currentDept = el.closest(".dept-card").dataset.dept;
+
+    document.getElementById("current-program-name").textContent = currentProgram;
+    document.getElementById("current-dept-name").textContent = currentDept;
+
+    document.getElementById("departments-view").classList.add("hidden");
+    document.getElementById("program-portal-view").classList.add("active");
+
+    renderProgramLessons();
+    window.scrollTo({ top: 100, behavior: "smooth" });
+}
+
+function goBackToDepts() {
+    document.getElementById("departments-view").classList.remove("hidden");
+    document.getElementById("program-portal-view").classList.remove("active");
+    currentProgram = null;
+    currentDept = null;
+}
+
+function goHome() {
+    goBackToDepts();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function renderProgramLessons() {
+    const container = document.getElementById("program-lessons-container");
+    const empty = document.getElementById("empty-lessons");
+
+    const lessons = allLessons[currentProgram] || [];
+    const visibleLessons = currentUser === "admin"
+        ? lessons
+        : lessons.filter(lesson => !lesson.hidden);
+
+    container.innerHTML = "";
+    empty.style.display = visibleLessons.length ? "none" : "block";
+
+    visibleLessons.forEach((lesson, index) => {
+        const card = document.createElement("article");
+        card.className = "lesson-card" + (lesson.hidden ? " hidden-lesson" : "");
+        card.style.animationDelay = `${index * 0.05}s`;
+
+        card.innerHTML = `
+            <div class="lesson-top">
+                <span class="file-type">${escapeHTML(lesson.fileType || "FILE")}</span>
+                ${currentUser === "admin" && lesson.hidden ? '<span class="hidden-badge">HIDDEN</span>' : ""}
+            </div>
+            <div class="lesson-body">
+                <h3>${escapeHTML(lesson.title || "Untitled Lesson")}</h3>
+                <p>${escapeHTML(lesson.description || "")}</p>
+                <table class="uploader-table">
+                    <thead>
+                        <tr><th>Uploaded By</th><th>Date Uploaded</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>👨‍🏫 ${escapeHTML(lesson.uploadedBy || "Admin")}</td>
+                            <td>📅 ${escapeHTML(formatDate(lesson.createdAt))}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="lesson-actions">
+                    <a class="view-btn" href="${escapeHTML(lesson.fileUrl || "#")}" target="_blank" rel="noopener noreferrer" data-lesson-view="${escapeHTML(lesson.id)}">View Lesson</a>
+                    ${currentUser === "admin" ? `
+                        <div class="admin-lesson-actions">
+                            <button type="button" class="edit-btn" data-lesson-action="edit" data-lesson-id="${escapeHTML(lesson.id)}">Edit</button>
+                            <button type="button" class="hide-btn" data-lesson-action="hide" data-lesson-id="${escapeHTML(lesson.id)}">${lesson.hidden ? "Unhide" : "Hide"}</button>
+                            <button type="button" class="delete-btn" data-lesson-action="delete" data-lesson-id="${escapeHTML(lesson.id)}">Delete</button>
+                        </div>
+                    ` : ""}
+                </div>
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function findLessonById(id) {
+    const found = Object.entries(allLessons)
+        .find(([program, lessons]) => lessons.some(lesson => String(lesson.id) === String(id)));
+
+    if (!found) return null;
+
+    return {
+        program: found[0],
+        lessons: found[1],
+        lesson: found[1].find(item => String(item.id) === String(id))
+    };
+}
+
+function viewLesson(id) {
+    const found = findLessonById(id);
+    const lesson = found ? found.lesson : null;
+
+    if (!lesson) {
+        showToast("Lesson could not be found.");
+        return false;
+    }
+
+    if (!lesson.fileUrl) {
+        showToast("This lesson has no available Google Drive file.");
+        return false;
+    }
+
+    window.location.href = lesson.fileUrl;
+    return true;
+}
+
+/* ================= COUNTS ================= */
+
+function updateAllCounts() {
+    const items = document.querySelectorAll(".program-item");
+
+    items.forEach(item => {
+        const program = item.dataset.program;
+        const count = (allLessons[program] || [])
+            .filter(lesson => currentUser === "admin" || !lesson.hidden).length;
+
+        const badge = item.querySelector(".lesson-count");
+        if (badge) badge.textContent = `${count} ${count === 1 ? "lesson" : "lessons"}`;
+    });
+}
+
+/* ================= UPLOAD ================= */
+
+function openUploadModal() {
+    if (currentUser !== "admin") {
+        showToast("Only an Admin can upload lessons.");
+        return;
+    }
+
+    document.getElementById("uploadModal").classList.add("active");
+
+    if (currentProgram && currentDept) {
+        document.getElementById("uploadDept").value = currentDept;
+        updateProgramOptions();
+        document.getElementById("uploadProgram").value = currentProgram;
+    }
+}
+
+function closeUploadModal() {
+    document.getElementById("uploadModal").classList.remove("active");
+    document.getElementById("uploadForm").reset();
+    document.getElementById("uploadError").textContent = "";
+    updateProgramOptions();
+}
+
+async function uploadLesson(event) {
+    event.preventDefault();
+
+    if (currentUser !== "admin") {
+        document.getElementById("uploadError").textContent = "❌ Admin access is required.";
+        return;
+    }
+
+    if (!apiReady()) {
+        document.getElementById("uploadError").textContent =
+            "❌ Google Drive is not connected. Add your Apps Script Web App URL.";
+        return;
+    }
+
+    const file = document.getElementById("lessonFile").files[0];
+
+    if (!file) {
+        document.getElementById("uploadError").textContent = "❌ Please select a file.";
+        return;
+    }
+
+    if (file.size > MAX_UPLOAD_BYTES) {
+        document.getElementById("uploadError").textContent = "❌ File is larger than 300 MB.";
+        return;
+    }
+
+    const program = document.getElementById("uploadProgram").value;
+    const title = document.getElementById("lessonTitle").value.trim();
+    const description = document.getElementById("lessonDescription").value.trim();
+    const uploadedBy = document.getElementById("uploaderName").value.trim();
+    const department = document.getElementById("uploadDept").value;
+
+    if (!program || !title || !description || !uploadedBy || !department) {
+        document.getElementById("uploadError").textContent =
+            "❌ Please complete all required fields.";
+        return;
+    }
+
+    try {
+        showLoading(`Starting upload… 0% (${formatBytes(0)} / ${formatBytes(file.size)})`);
+        document.getElementById("uploadError").textContent =
+            "Preparing a resumable Google Drive upload… Please wait.";
+
+        const session = await apiRequest("startUpload", {
+            title,
+            description,
+            department,
+            program,
+            uploadedBy,
+            originalName: file.name,
+            fileType: file.name.split(".").pop().toUpperCase(),
+            mimeType: file.type || "application/octet-stream",
+            fileSize: String(file.size)
+        });
+
+        if (!session.sessionUrl) {
+            throw new Error("Google Drive did not return a resumable upload session.");
+        }
+
+        const driveFile = await uploadFileResumable(session.sessionUrl, file, "Uploading lesson");
+        if (!driveFile.id) {
+            throw new Error("Google Drive finished the upload but did not return a file ID.");
+        }
+
+        showLoading("Finalizing lesson record… Please wait.");
+        document.getElementById("uploadError").textContent =
+            "Upload complete. Saving lesson information… Please wait.";
+
+        await apiRequest("finalizeUpload", {
+            title,
+            description,
+            department,
+            program,
+            uploadedBy,
+            originalName: file.name,
+            fileType: file.name.split(".").pop().toUpperCase(),
+            mimeType: file.type || "application/octet-stream",
+            fileId: driveFile.id
+        });
+
+        await loadLessonsFromDrive();
+        closeUploadModal();
+
+        showToast(`✅ "${title}" was uploaded to Google Drive successfully.`);
+    } catch (error) {
+        console.error(error);
+        const message = error.message || "Unknown error.";
+        const authProblem = /UrlFetchApp|script\.external_request|authorization|authorization|permission/i.test(message);
+        document.getElementById("uploadError").textContent = authProblem
+            ? "❌ Google Drive upload authorization is not ready. In your Apps Script project, run authorizeLessonVault() once, approve the Google permissions, then redeploy the Web App."
+            : "❌ Upload failed: " + message;
+    } finally {
+        while (loadingDepth > 0) hideLoading();
+    }
+}
+
+/* ================= EDIT / HIDE ================= */
+
+function openEditModal(id) {
+    if (currentUser !== "admin") {
+        return showToast("Only an Admin can edit lessons.");
+    }
+
+    const found = findLessonById(id);
+    if (!found) return showToast("Lesson could not be found.");
+
+    editingLessonId = id;
+
+    document.getElementById("editLessonTitle").value = found.lesson.title || "";
+    document.getElementById("editUploaderName").value = found.lesson.uploadedBy || "";
+    document.getElementById("editLessonDescription").value = found.lesson.description || "";
+    document.getElementById("editLessonFile").value = "";
+    document.getElementById("editError").textContent = "";
+    document.getElementById("editModal").classList.add("active");
+}
+
+function closeEditModal() {
+    editingLessonId = null;
+    document.getElementById("editModal").classList.remove("active");
+    document.getElementById("editForm").reset();
+    document.getElementById("editError").textContent = "";
+}
+
+async function saveEditedLesson(event) {
+    event.preventDefault();
+
+    if (currentUser !== "admin") {
+        document.getElementById("editError").textContent =
+            "❌ Admin access is required.";
+        return;
+    }
+
+    if (!apiReady()) {
+        document.getElementById("editError").textContent =
+            "❌ Google Drive is not connected.";
+        return;
+    }
+
+    const found = findLessonById(editingLessonId);
+    if (!found) return;
+
+    const file = document.getElementById("editLessonFile").files[0];
+
+    if (file && file.size > MAX_UPLOAD_BYTES) {
+        document.getElementById("editError").textContent =
+            "❌ File is larger than 300 MB.";
+        return;
+    }
+
+    const title = document.getElementById("editLessonTitle").value.trim();
+    const uploadedBy = document.getElementById("editUploaderName").value.trim();
+    const description = document.getElementById("editLessonDescription").value.trim();
+
+    if (!title || !uploadedBy || !description) {
+        document.getElementById("editError").textContent =
+            "❌ Please complete all required fields.";
+        return;
+    }
+
+    try {
+        document.getElementById("editError").textContent =
+            file ? "Preparing replacement upload… Please wait." : "Saving changes… Please wait.";
+
+        if (file) {
+            showLoading(`Starting replacement upload… 0% (${formatBytes(0)} / ${formatBytes(file.size)})`);
+
+            const session = await apiRequest("startUpdateUpload", {
+                fileId: found.lesson.fileId,
+                originalName: file.name,
+                mimeType: file.type || "application/octet-stream",
+                fileSize: String(file.size)
+            });
+
+            if (!session.sessionUrl) {
+                throw new Error("Google Drive did not return a resumable replacement session.");
+            }
+
+            const driveFile = await uploadFileResumable(session.sessionUrl, file, "Replacing lesson file");
+            if (!driveFile.id) {
+                throw new Error("Google Drive finished the replacement upload but did not return a file ID.");
+            }
+
+            showLoading("Finalizing lesson changes… Please wait.");
+            await apiRequest("finalizeUpdate", {
+                id: editingLessonId,
+                title,
+                uploadedBy,
+                description,
+                originalName: file.name,
+                fileType: file.name.split(".").pop().toUpperCase(),
+                mimeType: file.type || "application/octet-stream",
+                fileId: driveFile.id
+            });
+        } else {
+            showLoading("Saving changes… Please wait.");
+            await apiRequest("updateLesson", {
+                id: editingLessonId,
+                title,
+                uploadedBy,
+                description
+            });
+        }
+
+        await loadLessonsFromDrive();
+        closeEditModal();
+        showToast(`✅ "${title}" was updated successfully.`);
+    } catch (error) {
+        console.error(error);
+        const message = error.message || "Unknown error.";
+        const authProblem = /UrlFetchApp|script\.external_request|authorization|permission/i.test(message);
+        document.getElementById("editError").textContent = authProblem
+            ? "❌ Google Drive upload authorization is not ready. Run authorizeLessonVault() once in Apps Script, approve permissions, then redeploy the Web App."
+            : "❌ Update failed: " + message;
+    } finally {
+        while (loadingDepth > 0) hideLoading();
+    }
+}
+
+async function toggleLessonHidden(id) {
+    if (currentUser !== "admin") return;
+
+    if (!apiReady()) {
+        return showToast("Google Drive is not connected.");
+    }
+
+    const found = findLessonById(id);
+    if (!found) return;
+
+    try {
+        const newHidden = !found.lesson.hidden;
+
+        await apiRequest("setHidden", {
+            id,
+            hidden: newHidden
+        });
+
+        await loadLessonsFromDrive();
+
+        showToast(
+            newHidden
+                ? "🙈 Lesson hidden from students."
+                : "👁 Lesson is now visible to students."
+        );
+    } catch (error) {
+        console.error(error);
+        showToast("Unable to change lesson visibility.");
+    }
+}
+
+/* ================= DELETE ================= */
+
+async function deleteLesson(id) {
+    if (currentUser !== "admin") return;
+
+    if (!apiReady()) {
+        return showToast("Google Drive is not connected.");
+    }
+
+    const found = findLessonById(id);
+    if (!found) return;
+
+    const lesson = found.lesson;
+
+    if (!confirm(`Delete "${lesson.title}"? This will permanently remove the Google Drive file.`)) {
+        return;
+    }
+
+    try {
+        await apiRequest("deleteLesson", { id });
+        await loadLessonsFromDrive();
+
+        showToast(`🗑️ "${lesson.title}" was deleted.`);
+    } catch (error) {
+        console.error(error);
+        showToast("Unable to delete the lesson: " + (error.message || ""));
+    }
+}
+
+/* ================= LESSON BUTTON EVENTS ================= */
+
+// Use delegated touch/click handling instead of inline onclick attributes.
+// This is more reliable when LessonVault is opened as a local HTML file on Android.
+document.addEventListener("click", async function(event) {
+    const button = event.target.closest("[data-lesson-action]");
+    if (!button) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const id = button.getAttribute("data-lesson-id");
+    const action = button.getAttribute("data-lesson-action");
+    if (!id || !action) return;
+
+    if (action === "edit") {
+        openEditModal(id);
+        return;
+    }
+
+    if (action === "hide") {
+        await toggleLessonHidden(id);
+        return;
+    }
+
+    if (action === "delete") {
+        await deleteLesson(id);
+    }
+});
+
+/* ================= EVENTS ================= */
+
+document.addEventListener("click", event => {
+    const wrapper = document.querySelector(".search-wrapper");
+    const results = document.getElementById("searchResults");
+
+    if (wrapper && results && !wrapper.contains(event.target)) {
+        results.style.display = "none";
+    }
+});
+
+window.addEventListener("click", event => {
+    const modal = document.getElementById("uploadModal");
+    const editModal = document.getElementById("editModal");
+
+    if (event.target === modal) closeUploadModal();
+    if (event.target === editModal) closeEditModal();
+});
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        closeUploadModal();
+        closeEditModal();
+    }
+
+    if (event.key === "Enter" &&
+        document.activeElement &&
+        ["studentPass", "adminPass"].includes(document.activeElement.id)) {
+
+        if (document.activeElement.id === "studentPass") studentLogin();
+        else adminLogin();
+    }
+});
+
+/* ================= START ================= */
+
+async function checkSession() {
+    populateDepartmentSelect();
+
+    if (currentUser === "student" || currentUser === "admin") {
+        await enterSite();
+    }
+}
+
+window.studentLogin = studentLogin;
+window.adminLogin = adminLogin;
+window.switchRole = switchRole;
+window.togglePassword = togglePassword;
+window.logout = logout;
+window.toggleDept = toggleDept;
+window.openUploadModal = openUploadModal;
+window.closeUploadModal = closeUploadModal;
+window.updateProgramOptions = updateProgramOptions;
+window.searchEverything = searchEverything;
+window.openSearchResult = openSearchResult;
+window.clearSearch = clearSearch;
+window.openProgramPortal = openProgramPortal;
+window.goBackToDepts = goBackToDepts;
+window.goHome = goHome;
+window.renderProgramLessons = renderProgramLessons;
+window.viewLesson = viewLesson;
+window.uploadLesson = uploadLesson;
+window.openEditModal = openEditModal;
+window.closeEditModal = closeEditModal;
+window.saveEditedLesson = saveEditedLesson;
+window.toggleLessonHidden = toggleLessonHidden;
+window.deleteLesson = deleteLesson;
+
+checkSession();
+</script>
+
+</body>
+</html>
